@@ -1,0 +1,26 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  IMAGE_DIVE: wagoodman/dive:latest
+  IMAGE_LINT: hadolint/hadolint:latest
+  IMAGE_SCAN: aquasec/trivy:latest
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  lint:
+    desc: Lint Dockerfile
+    cmds:
+      - docker run --rm -i -v ${PWD}:/data -w /data {{.IMAGE_LINT}} hadolint Dockerfile
+
+  dive:
+    desc: Analyze Docker image layers
+    cmds:
+      - docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v ${PWD}:/data -w /data {{.IMAGE_DIVE}} {{.IMAGE_NAME}}
+    vars:
+      IMAGE_NAME: renovate/renovate:latest
