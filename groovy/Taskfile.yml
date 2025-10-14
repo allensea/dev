@@ -1,0 +1,11 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  IMAGE: groovy:latest
+
+tasks:
+  default:
+    cmds:
+      - docker run --rm -v ${PWD}:/usr/src/myapp -w /usr/src/myapp ${IMAGE} groovy /usr/src/myapp/helloworld.groovy   
