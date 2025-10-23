@@ -1,0 +1,55 @@
+# https://taskfile.dev
+
+version: '3'
+
+env:
+  APP_IMAGE: hello-world:latest
+  DOCS_IMAGE: jnorwood/helm-docs:latest
+  HELM_IMAGE: chainguard/helm:latest-dev
+  HELM_CMD: docker run --rm -v .:/work -w /work chainguard/helm:latest-dev
+  KUBE_CONFIG: .kubeconfig
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+    silent: true
+
+  docs:
+    desc: "Generate Helm chart documentation"
+    cmds:
+      - docker run --rm -v .:/work -w /work ${DOCS_IMAGE} helm-docs
+
+  lint:
+    desc: "Lint Helm chart"
+    cmds:
+      - ${HELM_CMD} lint .
+
+  template:
+    desc: "Render Helm templates"
+    cmds:
+      - ${HELM_CMD} template example .
+
+  kind:create:
+    desc: "Start KinD cluster"
+    cmds:
+      - kind create cluster --name microservice
+      - kind get kubeconfig --name microservice > ${KUBE_CONFIG}
+      - kubectl cluster-info --context kind-microservice
+
+  kind:clusterinfo:
+    desc: "Display KinD cluster info"
+    cmds:
+      - kubectl cluster-info --kubeconfig ${KUBE_CONFIG}
+
+  kind:delete:
+    desc: "Delete KinD cluster"
+    cmds:
+      - kind delete cluster --name microservice
+      - rm -f ${KUBE_CONFIG}
+
+  kind:load:
+    desc: "Load app image into KinD cluster"
+    cmds:
+      - docker pull ${APP_IMAGE}
+      - kind load docker-image ${APP_IMAGE} --name microservice
