@@ -5,5 +5,5 @@
 # ~/.aws/config
 
 [profile terraform]
-credential_process = sh -c "ls -t ~/.aws/cli/cache/*.json | head -n1 | xargs cat | jq -r '.Credentials + {Version: 1}'"
+credential_process = aws configure export-credentials --profile <<profile_name>>
 ```
