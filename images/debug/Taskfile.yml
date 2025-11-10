@@ -1,0 +1,34 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  IMAGE: debug:latest
+  IMAGE_CONTAINER_STRUCTURE_TEST: gcr.io/gcp-runtimes/container-structure-test:latest
+
+tasks:
+  default:
+    cmds:
+      - task --list --sort alphanumeric
+      - echo ""
+    silent: true
+
+  build:
+    desc: Build the Docker image
+    cmds:
+      - docker build -t {{.IMAGE}} .
+
+  test:
+    desc: Run container-structure-test against the debug image
+    cmds:
+      - docker run --rm -v ${PWD}:/mnt -v "/var/run/docker.sock:/var/run/docker.sock" {{.IMAGE_CONTAINER_STRUCTURE_TEST}} test --image {{.IMAGE}} --config /mnt/container-structure-test.yaml
+
+  run:
+    desc: Run a container from the debug image
+    cmds:
+      - docker run --rm -it {{.IMAGE}}
+
+  debug:
+    desc: kubectl debug into a pod using the debug image
+    cmds:
+      - kubectl debug -it <pod-name> --image={{.IMAGE}} --target=<pod-name>
