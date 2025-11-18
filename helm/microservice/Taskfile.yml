@@ -30,6 +30,11 @@ tasks:
     cmds:
       - ${HELM_CMD} template example .
 
+  install:
+    desc: "Install Helm chart into current kube-context"
+    cmds:
+      - ${HELM_CMD} upgrade --install microservice . --values values.yaml
+
   kind:create:
     desc: "Start KinD cluster"
     cmds:
